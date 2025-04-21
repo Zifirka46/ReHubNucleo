@@ -14,12 +14,12 @@ DEMS22A encodFootRightLink(PIN_BURNS_CLOCK, PIN_BURNS_DATA, PIN_CS_FOOT_RIGHT);
 // Для правых энкодров умножаем на -1
 // Задаем нули энкодеров
 void setupEncod(){
-    encodHipLeftLink.setOffset(-102);
-    encodKneeLeftLink.setOffset(-492);
-    encodFootLeftLink.setOffset(-445);
-    encodHipRightLink.setOffset(-539);
-    encodKneeRightLink.setOffset(-336);
-    encodFootRightLink.setOffset(-506);
+    encodHipLeftLink.setOffset(-608);
+    encodKneeLeftLink.setOffset(-841);
+    encodFootLeftLink.setOffset(-570);
+    encodHipRightLink.setOffset(-815);
+    encodKneeRightLink.setOffset(-301);
+    encodFootRightLink.setOffset(-932);
 }
 
 // Обновляем показания энкодеров

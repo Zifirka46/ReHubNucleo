@@ -50,12 +50,12 @@ void sendingData(){
         _output += start_marker;
         _output += angle_hip_left;
         _output += separator;
-        _output += angle_knee_left;
+        _output += -1 * angle_knee_left;
         _output += separator;
-        _output += angle_foot_left;
+        _output += -1 * angle_foot_left;
         _output += separator;
 
-        _output += -1 * angle_hip_right;
+        _output += angle_hip_right;
         _output += separator;
         _output += -1 * angle_knee_right;
         _output += separator;

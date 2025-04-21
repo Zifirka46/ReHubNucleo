@@ -275,7 +275,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
         case 1:
         {
             _hip_left_set_pos_deg = __poly_hip_left.getPosition();
-            driverHipLeftLink.control(_hip_left_set_pos_deg);
+            driverHipLeftLink.controlLink(_hip_left_set_pos_deg);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
@@ -309,7 +309,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
         {
             _knee_left_set_pos_deg = __poly_knee_left.getPosition();
             driverHipLeftLink.manualControlLink(0);
-            driverKneeLeftLink.control(_knee_left_set_pos_deg);
+            driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
@@ -343,7 +343,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
             _foot_left_set_pos_deg = __poly_foot_left.getPosition();
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
-            driverFootLeftLink.control(_foot_left_set_pos_deg);
+            driverFootLeftLink.controlLink(_foot_left_set_pos_deg);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
@@ -377,7 +377,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -411,7 +411,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
 
             if (__poly_knee_right.isFinished())
@@ -445,7 +445,7 @@ void setAngleDesired(int motorNumber, float angle, float time)
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
-            driverFootRightLink.control(_foot_right_set_pos_deg);
+            driverFootRightLink.controlLink(_foot_right_set_pos_deg);
 
             if (__poly_foot_right.isFinished())
             {
@@ -515,7 +515,7 @@ void setMotorSpeedAdj(int motorNumber, int speed)
     }
 }
 
-void stopAllMotors()
+void stopAllMotorsAdj()
 {
     detachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_LEFT));
     detachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_LEFT));
@@ -565,7 +565,7 @@ void SetPositionDesired(int linkNumber, float length, float time)
         {
             attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_LEFT), encodHipLeftHandler, CHANGE);
             _hip_left_set_pos_len = __poly_hip_left_adj.getPosition();
-            driverHipLeftAdj.control(_hip_left_set_pos_len);
+            driverHipLeftAdj.controlAdjEnc(_hip_left_set_pos_len);
             driverKneeLeftAdj.manualControlAdj(0);
             driverFootLeftAdj.manualControl(0);
             driverHipRightAdj.manualControlAdj(0);
@@ -603,7 +603,7 @@ void SetPositionDesired(int linkNumber, float length, float time)
             attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_LEFT), encodKneeLeftHandler, CHANGE);
             _knee_left_set_pos_len = __poly_knee_left_adj.getPosition();
             driverHipLeftAdj.manualControlAdj(0);
-            driverKneeLeftAdj.control(_knee_left_set_pos_len);
+            driverKneeLeftAdj.controlAdjEnc(_knee_left_set_pos_len);
             driverFootLeftAdj.manualControl(0);
             driverHipRightAdj.manualControlAdj(0);
             driverKneeRightAdj.manualControlAdj(0);
@@ -667,7 +667,7 @@ void SetPositionDesired(int linkNumber, float length, float time)
             driverHipLeftAdj.manualControlAdj(0);
             driverKneeLeftAdj.manualControlAdj(0);
             driverFootLeftAdj.manualControl(0);
-            driverHipRightAdj.control(_hip_right_set_pos_len);
+            driverHipRightAdj.controlAdjEnc(_hip_right_set_pos_len);
             driverKneeRightAdj.manualControlAdj(0);
             driverFootRightAdj.manualControl(0);
 
@@ -705,7 +705,7 @@ void SetPositionDesired(int linkNumber, float length, float time)
             driverKneeLeftAdj.manualControlAdj(0);
             driverFootLeftAdj.manualControl(0);
             driverHipRightAdj.manualControlAdj(0);
-            driverKneeRightAdj.control(_knee_right_set_pos_len);
+            driverKneeRightAdj.controlAdjEnc(_knee_right_set_pos_len);
             driverFootRightAdj.manualControl(0);
 
             if (__poly_knee_right_adj.isFinished())
@@ -856,6 +856,7 @@ void mainControl()
             else if (input.equals("Stop"))
             {
                 stopAllMotorsLink();
+                stopAllMotorsAdj();
             }
             else if (input.equals("Init"))
             {
@@ -964,12 +965,12 @@ void mainControl()
         _knee_right_set_pos_deg = __poly_knee_right.getPosition();
         _foot_right_set_pos_deg = __poly_foot_right.getPosition();
 
-        driverHipLeftLink.control(_hip_left_set_pos_deg);
-        driverKneeLeftLink.control(_knee_left_set_pos_deg);
-        driverFootLeftLink.control(_foot_left_set_pos_deg);
-        driverHipRightLink.control(_hip_right_set_pos_deg);
-        driverKneeRightLink.control(_knee_right_set_pos_deg);
-        driverFootRightLink.control(_foot_right_set_pos_deg);
+        driverHipLeftLink.controlLink(_hip_left_set_pos_deg);
+        driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
+        driverFootLeftLink.controlLink(_foot_left_set_pos_deg);
+        driverHipRightLink.controlLink(_hip_right_set_pos_deg);
+        driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
+        driverFootRightLink.controlLink(_foot_right_set_pos_deg);
 
         // Проверяем, заняли ли приводы начальное положение
         if (__poly_hip_left.isFinished() && __poly_knee_left.isFinished() && __poly_foot_left.isFinished() &&
@@ -1039,7 +1040,7 @@ void mainControl()
         {
             _hip_left_set_pos_deg = __poly_hip_left.getPosition();
 
-            driverHipLeftLink.control(_hip_left_set_pos_deg);
+            driverHipLeftLink.controlLink(_hip_left_set_pos_deg);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
@@ -1060,7 +1061,7 @@ void mainControl()
             _knee_left_set_pos_deg = __poly_knee_left.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
-            driverKneeLeftLink.control(_knee_left_set_pos_deg);
+            driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
@@ -1081,7 +1082,7 @@ void mainControl()
 
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
-            driverFootLeftLink.control(_foot_left_set_pos_deg);
+            driverFootLeftLink.controlLink(_foot_left_set_pos_deg);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
@@ -1101,7 +1102,7 @@ void mainControl()
 
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
-            driverFootLeftLink.control(_foot_left_set_pos_deg);
+            driverFootLeftLink.controlLink(_foot_left_set_pos_deg);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
@@ -1120,7 +1121,7 @@ void mainControl()
             _knee_left_set_pos_deg = __poly_knee_left.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
-            driverKneeLeftLink.control(_knee_left_set_pos_deg);
+            driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
@@ -1139,7 +1140,7 @@ void mainControl()
         {
             _hip_left_set_pos_deg = __poly_hip_left.getPosition();
 
-            driverHipLeftLink.control(_hip_left_set_pos_deg);
+            driverHipLeftLink.controlLink(_hip_left_set_pos_deg);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
@@ -1162,7 +1163,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1183,7 +1184,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
 
             if (__poly_knee_right.isFinished())
@@ -1204,7 +1205,7 @@ void mainControl()
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
-            driverFootRightLink.control(_foot_right_set_pos_deg);
+            driverFootRightLink.controlLink(_foot_right_set_pos_deg);
 
             if (__poly_foot_right.isFinished())
             {
@@ -1224,7 +1225,7 @@ void mainControl()
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
-            driverFootRightLink.control(_foot_right_set_pos_deg);
+            driverFootRightLink.controlLink(_foot_right_set_pos_deg);
 
             if (__poly_foot_right.isFinished())
             {
@@ -1243,7 +1244,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
 
             if (__poly_knee_right.isFinished())
@@ -1262,7 +1263,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1334,7 +1335,7 @@ void mainControl()
             _knee_left_set_pos_deg = __poly_knee_left.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
-            driverKneeLeftLink.control(_knee_left_set_pos_deg);
+            driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
@@ -1354,7 +1355,7 @@ void mainControl()
         {
             _hip_left_set_pos_deg = __poly_hip_left.getPosition();
 
-            driverHipLeftLink.control(_hip_left_set_pos_deg);
+            driverHipLeftLink.controlLink(_hip_left_set_pos_deg);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
@@ -1376,7 +1377,7 @@ void mainControl()
             _knee_left_set_pos_deg = __poly_knee_left.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
-            driverKneeLeftLink.control(_knee_left_set_pos_deg);
+            driverKneeLeftLink.controlLink(_knee_left_set_pos_deg);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
@@ -1398,7 +1399,7 @@ void mainControl()
 
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
-            driverFootLeftLink.control(_foot_left_set_pos_deg);
+            driverFootLeftLink.controlLink(_foot_left_set_pos_deg);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
@@ -1421,7 +1422,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
 
             if (__poly_knee_right.isFinished())
@@ -1441,7 +1442,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1463,7 +1464,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
 
             if (__poly_knee_right.isFinished())
@@ -1485,7 +1486,7 @@ void mainControl()
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
             driverKneeRightLink.manualControlLink(0);
-            driverFootRightLink.control(_foot_right_set_pos_deg);
+            driverFootRightLink.controlLink(_foot_right_set_pos_deg);
 
             if (__poly_foot_left.isFinished())
             {
@@ -1576,7 +1577,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1597,7 +1598,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
             if (__poly_knee_right.isFinished())
             {
@@ -1626,8 +1627,8 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(rad2deg(-1 * angle.q1));
-            driverKneeRightLink.control(rad2deg(-1 * angle.q21));
+            driverHipRightLink.controlLink(rad2deg(-1 * angle.q1));
+            driverKneeRightLink.controlLink(rad2deg(-1 * angle.q21));
             driverFootRightLink.manualControlLink(0);
 
             Serial.print(kinematics.A3x);
@@ -1720,7 +1721,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1741,7 +1742,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
             if (__poly_knee_right.isFinished())
             {
@@ -1762,8 +1763,8 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(rad2deg(-1 * angle.q1));
-            driverKneeRightLink.control(rad2deg(-1 * angle.q21));
+            driverHipRightLink.controlLink(rad2deg(-1 * angle.q1));
+            driverKneeRightLink.controlLink(rad2deg(-1 * angle.q21));
             driverFootRightLink.manualControlLink(0);
 
             Serial.print(kinematics.A3x);
@@ -1858,7 +1859,7 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(_hip_right_set_pos_deg);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
             driverKneeRightLink.manualControlLink(0);
             driverFootRightLink.manualControlLink(0);
 
@@ -1879,7 +1880,7 @@ void mainControl()
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
             driverHipRightLink.manualControlLink(0);
-            driverKneeRightLink.control(_knee_right_set_pos_deg);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
             driverFootRightLink.manualControlLink(0);
             if (__poly_knee_right.isFinished())
             {
@@ -1918,8 +1919,8 @@ void mainControl()
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.control(rad2deg(-1 * angle.q1));
-            driverKneeRightLink.control(rad2deg(-1 * angle.q21));
+            driverHipRightLink.controlLink(rad2deg(-1 * angle.q1));
+            driverKneeRightLink.controlLink(rad2deg(-1 * angle.q21));
             driverFootRightLink.manualControlLink(0);
 
             Serial.print(kinematics.A3x);
@@ -2011,7 +2012,7 @@ void mainControl()
             String input = Serial.readStringUntil('\n');
             if (input.equals("Stop"))
             {
-                stopAllMotors();
+                stopAllMotorsAdj();
                 system_state = SS_MAIN_MENU;
             }
         }
@@ -2147,7 +2148,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_LEFT), encodHipLeftHandler, CHANGE);
                 _hip_left_set_pos_deg_adj = __poly_hip_left.getPosition();
-                driverHipLeftAdj.control(_hip_left_set_pos_deg_adj);
+                driverHipLeftAdj.controlAdjEnc(_hip_left_set_pos_deg_adj);
 
                 if (__poly_hip_left.isFinished())
                 {
@@ -2181,7 +2182,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_LEFT), encodKneeLeftHandler, CHANGE);
                 _knee_left_set_pos_deg_adj = __poly_knee_left.getPosition();
-                driverKneeLeftAdj.control(_knee_left_set_pos_deg_adj);
+                driverKneeLeftAdj.controlAdjEnc(_knee_left_set_pos_deg_adj);
 
                 if (__poly_knee_left.isFinished())
                 {
@@ -2214,7 +2215,7 @@ void mainControl()
             case 1:
             {
                 _foot_left_set_pos_deg_adj = __poly_foot_left.getPosition();
-                driverFootLeftAdj.control(_foot_left_set_pos_deg_adj);
+                driverFootLeftAdj.controlAdjPot(_foot_left_set_pos_deg_adj);
 
                 if (__poly_foot_left.isFinished())
                 {
@@ -2246,7 +2247,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_RIGHT), encodHipRightHandler, CHANGE);
                 _hip_right_set_pos_deg_adj = __poly_hip_right.getPosition();
-                driverHipRightAdj.control(_hip_right_set_pos_deg_adj);
+                driverHipRightAdj.controlAdjEnc(_hip_right_set_pos_deg_adj);
 
                 if (__poly_hip_right.isFinished())
                 {
@@ -2280,7 +2281,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_RIGHT), encodKneeRightHandler, CHANGE);
                 _knee_right_set_pos_deg_adj = __poly_knee_right.getPosition();
-                driverKneeRightAdj.control(_knee_right_set_pos_deg_adj);
+                driverKneeRightAdj.controlAdjEnc(_knee_right_set_pos_deg_adj);
 
                 if (__poly_knee_right.isFinished())
                 {
@@ -2313,7 +2314,7 @@ void mainControl()
             case 1:
             {
                 _foot_right_set_pos_deg_adj = __poly_foot_right.getPosition();
-                driverFootRightAdj.control(_foot_right_set_pos_deg_adj);
+                driverFootRightAdj.controlAdjPot(_foot_right_set_pos_deg_adj);
 
                 if (__poly_foot_right.isFinished())
                 {
@@ -2345,7 +2346,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_RIGHT), encodKneeRightHandler, CHANGE);
                 _knee_right_set_pos_deg_adj = __poly_knee_right.getPosition();
-                driverKneeRightAdj.control(_knee_right_set_pos_deg_adj);
+                driverKneeRightAdj.controlAdjEnc(_knee_right_set_pos_deg_adj);
 
                 if (__poly_knee_right.isFinished())
                 {
@@ -2379,7 +2380,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_RIGHT), encodHipRightHandler, CHANGE);
                 _hip_right_set_pos_deg_adj = __poly_hip_right.getPosition();
-                driverHipRightAdj.control(_hip_right_set_pos_deg_adj);
+                driverHipRightAdj.controlAdjEnc(_hip_right_set_pos_deg_adj);
 
                 if (__poly_hip_right.isFinished())
                 {
@@ -2413,7 +2414,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_KNEE_LEFT), encodKneeLeftHandler, CHANGE);
                 _knee_left_set_pos_deg_adj = __poly_knee_left.getPosition();
-                driverKneeLeftAdj.control(_knee_left_set_pos_deg_adj);
+                driverKneeLeftAdj.controlAdjEnc(_knee_left_set_pos_deg_adj);
 
                 if (__poly_knee_left.isFinished())
                 {
@@ -2447,7 +2448,7 @@ void mainControl()
             {
                 attachInterrupt(digitalPinToInterrupt(PIN_OPTO_ENCODER_HIP_LEFT), encodHipLeftHandler, CHANGE);
                 _hip_left_set_pos_deg_adj = __poly_hip_left.getPosition();
-                driverHipLeftAdj.control(_hip_left_set_pos_deg_adj);
+                driverHipLeftAdj.controlAdjEnc(_hip_left_set_pos_deg_adj);
 
                 if (__poly_hip_left.isFinished())
                 {

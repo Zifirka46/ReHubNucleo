@@ -26,7 +26,7 @@ class DriverControllerMaxon : public GyverPID{
                 _pwm = map(_pwm, 0, 255, 24, 229);
             } else if(_voltage < 0) {
                digitalWrite(_pin_dir, HIGH);
-                _pwm = map(_pwm, -1, -255, 24, 229);
+                _pwm = map(_pwm, 0, 255, 24, 229);
             } else{
                 _pwm = 24;
             }
@@ -35,7 +35,7 @@ class DriverControllerMaxon : public GyverPID{
         }
 
         // Функция управления приводом
-        void control(float set_point){
+        void controlLink(float set_point){
             // Передаем регулятору текущее и заданные положения
             setpoint = set_point;
             input = _encoderObj.getPositionDeg();
@@ -189,7 +189,7 @@ class DriverControllerEncod : public GyverPID{
         }
 
         // Функция регулятора, перемещает привод в переданное положение
-        void control(float set_point){
+        void controlAdjEnc(float set_point){
             // Передаем значения переменных регулятору
             setpoint = set_point;
             input = _encoderObj.getPosition();
@@ -273,7 +273,7 @@ class DriverControllerPoten : public GyverPID{
         }
         
         // Функция регулятора, перемещает привод в переданное положение
-        void control(float set_point){
+        void controlAdjPot(float set_point){
             // Передаем значения переменных регулятору
             setpoint = set_point;
             input = _potenFunk();

@@ -19,15 +19,12 @@
 
 void setup(){
     setupPins();
+    analogReadResolution(10);
 
     Serial.begin(9600);
     setupEncod();
 
     setEncodScales();
-    for(int i = 0; i <= 16; i++){
-        getAngleFootLeftADC();
-        getAngleFootRightADC();
-    }
 }
 
 void loop(){
