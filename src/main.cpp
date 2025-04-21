@@ -18,13 +18,18 @@
 #include "communication.h"
 
 void setup(){
-    setupPins();
     analogReadResolution(10);
 
     Serial.begin(9600);
     setupEncod();
 
     setEncodScales();
+
+    pinMode(PIN_RELAY_ADJ, OUTPUT);
+    pinMode(PIN_RELAY_MAX, OUTPUT);
+
+    digitalWrite(PIN_RELAY_ADJ, HIGH);
+    digitalWrite(PIN_RELAY_MAX, HIGH);
 }
 
 void loop(){
