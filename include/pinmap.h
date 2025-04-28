@@ -176,15 +176,3 @@
 //Реле
 #define PIN_RELAY_ADJ PB4 //Регулеровки
 #define PIN_RELAY_MAX PA15 //Звенья(максоны)
-
-// Настройка пинов
-void setupPins()
-{
-
-    pinMode(PIN_RELAY_ADJ, OUTPUT);
-    pinMode(PIN_RELAY_MAX, OUTPUT);
-
-    // Запуск реле
-    digitalWrite(PIN_RELAY_ADJ, HIGH);
-    digitalWrite(PIN_RELAY_MAX, HIGH);
-}

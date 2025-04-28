@@ -28,8 +28,8 @@ void setup(){
     pinMode(PIN_RELAY_ADJ, OUTPUT);
     pinMode(PIN_RELAY_MAX, OUTPUT);
 
-    digitalWrite(PIN_RELAY_ADJ, HIGH);
-    digitalWrite(PIN_RELAY_MAX, HIGH);
+    digitalWrite(PIN_RELAY_ADJ, LOW);
+    digitalWrite(PIN_RELAY_MAX, LOW);
 }
 
 void loop(){
