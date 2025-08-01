@@ -20,11 +20,12 @@
 void setup(){
     setupPins();
     analogReadResolution(10);
-
+    analogWriteResolution(10);
+    
     Serial.begin(9600);
     setupEncod();
-
     setEncodScales();
+    
 }
 
 void loop(){

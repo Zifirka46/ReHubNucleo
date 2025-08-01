@@ -46,14 +46,14 @@ float rad2deg(float angle)
 }
 
 float lyambda = 0.99;          // Коэффициент показывающий насколько нога будет прямая
-float angle_des = deg2rad(15); // Желаемый угол
-float lengthHip = 0.4;         // Длина бедра
-float lengthKnee = 0.4;        // Длина голени
+float angle_des = deg2rad(-1); // Желаемый угол
+float lengthHip = 0.39;         // Длина бедра
+float lengthKnee = 0.39;        // Длина голени
 float ls = 0.2;
 float hs = 0.1;
-const int hmn_gt_time = 5; // Пар-тр для 3 походки(время шага)
-float hmn_gt_scaling = 0.9;
-float hmn_gt_z_offset = -0.79;
+const int hmn_gt_time = 2; // Пар-тр для 3 походки(время шага)
+float hmn_gt_scaling = 0.85;
+float hmn_gt_scaling_z = 1.2;
 
 float x_ankle_start_des; // Желаемая точка по иксу
 float y_ankle_start_des; // Желаемая точка по игрику
@@ -63,62 +63,59 @@ float step_x;
 float step_y;
 float _x_targ;
 float _y_targ;
+float q1;
+float q21;
 float q1_des;
 float q21_des;
-float x_offset;
-float y_offset;
-float dt = 0.0159;
+double x_offset = -0.3598;
+double y_offset = -0.7919;
+float dt = 0.0;
 float t;
 int k = 0;
 const int hmn_gt_size = hmn_gt_time * 83;
 unsigned long last_time_hmn_gait;
+
+bool running = 0;
+float start_time = 0.0;
+float current_time = 0.0;
 
 void getApproxHmnGt(float &x_aprox, float &y_aprox, float x)
 {
 
     static float w, a0, a1, b1, a2, b2, a3, b3, a4, b4, a5, b5, a6, b6, a7, b7, a8, b8;
 
-    a0 = 0.07011;
-    a1 = -0.0411;
-    b1 = 0.05987;
-    a2 = -0.03011;
-    b2 = -0.02541;
-    a3 = 0.01418;
-    b3 = 0.01037;
-    a4 = -0.001549;
-    b4 = -0.000431;
-    a5 = -0.001278;
-    b5 = 0.001983;
-    a6 = 0.001459;
-    b6 = -0.0003046;
-    a7 = 0.0004606;
-    b7 = -0.0002769;
-    a8 = -0.0004648;
-    b8 = 0.0003664;
-    w = 4.772;
+    a0 =      0.3179 * hmn_gt_scaling; 
+    a1 =     -0.2687 * hmn_gt_scaling;
+    b1 =      0.1288 * hmn_gt_scaling;
+    a2 =    -0.05454* hmn_gt_scaling;
+    b2 =    -0.05705* hmn_gt_scaling;
+    a3 =     0.01883* hmn_gt_scaling;
+    b3 =   -0.008654 * hmn_gt_scaling;
+    a4 =  -0.0002569* hmn_gt_scaling;
+    b4 =     0.01156* hmn_gt_scaling;
+    w =        4.539 * (1.34f / hmn_gt_time);
 
-    y_aprox = a0 + a1 * cos(x * w) + b1 * sin(x * w) + a2 * cos(2 * x * w) + b2 * sin(2 * x * w) + a3 * cos(3 * x * w) + b3 * sin(3 * x * w) + a4 * cos(4 * x * w) + b4 * sin(4 * x * w) + a5 * cos(5 * x * w) + b5 * sin(5 * x * w) + a6 * cos(6 * x * w) + b6 * sin(6 * x * w) + a7 * cos(7 * x * w) + b7 * sin(7 * x * w) + a8 * cos(8 * x * w) + b8 * sin(8 * x * w);
+    x_aprox = a0 + a1*cos(x*w) + b1*sin(x*w) + a2*cos(2*x*w) + b2*sin(2*x*w) + 
+              a3*cos(3*x*w) + b3*sin(3*x*w) + a4*cos(4*x*w) + b4*sin(4*x*w);
 
-    a0 = -0.08484;
-    a1 = -0.09385;
-    b1 = -0.3012;
-    a2 = -0.01739;
-    b2 = 0.02488;
-    a3 = 0.005448;
-    b3 = 0.009218;
-    a4 = -0.008137;
-    b4 = 0.006326;
-    a5 = 0.002729;
-    b5 = 0.004278;
-    a6 = 0.001207;
-    b6 = -0.0002039;
-    a7 = 0.0005637;
-    b7 = -0.001207;
-    a8 = -0.0004928;
-    b8 = 0.0004946;
-    w = 4.772;
-
-    x_aprox = a0 + a1 * cos(x * w) + b1 * sin(x * w) + a2 * cos(2 * x * w) + b2 * sin(2 * x * w) + a3 * cos(3 * x * w) + b3 * sin(3 * x * w) + a4 * cos(4 * x * w) + b4 * sin(4 * x * w) + a5 * cos(5 * x * w) + b5 * sin(5 * x * w) + a6 * cos(6 * x * w) + b6 * sin(6 * x * w) + a7 * cos(7 * x * w) + b7 * sin(7 * x * w) + a8 * cos(8 * x * w) + b8 * sin(8 * x * w);
+    a0 =     0.09677 * hmn_gt_scaling_z;
+    a1 =     0.09289 * hmn_gt_scaling_z;
+    b1 =    -0.02086 * hmn_gt_scaling_z;
+    a2 =     0.01216 * hmn_gt_scaling_z;
+    b2 =    0.008177 * hmn_gt_scaling_z;
+    a3 =    -0.01752 * hmn_gt_scaling_z;
+    b3 =     0.02908 * hmn_gt_scaling_z;
+    a4 =    -0.01223 * hmn_gt_scaling_z;
+    b4 =     0.02525 * hmn_gt_scaling_z;
+    a5 =   -0.005644 * hmn_gt_scaling_z;
+    b5 =    0.009501 * hmn_gt_scaling_z;
+    a6 =   -0.002904 * hmn_gt_scaling_z;
+    b6 =   0.0009237 * hmn_gt_scaling_z;
+    w =        3.624 * (1.34f / hmn_gt_time);
+    
+    y_aprox =   a0 + a1*cos(x*w) + b1*sin(x*w) + a2*cos(2*x*w) + b2*sin(2*x*w) + 
+                a3*cos(3*x*w) + b3*sin(3*x*w) + a4*cos(4*x*w) + b4*sin(4*x*w) + a5*cos(5*x*w) + 
+                b5*sin(5*x*w) + a6*cos(6*x*w) + b6*sin(6*x*w);
 }
 
 //.......................................................................................................................

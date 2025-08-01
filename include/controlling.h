@@ -47,6 +47,21 @@ Kinematics directKinematics(float lengthHip, float lengthKnee)
     return result;
 }
 
+Kinematics directKinematics(float lengthHip, float lengthKnee, float _q1, float _q21)
+{
+    Kinematics result;
+    result.A1x = 0;
+    result.A1y = 0;
+
+    result.A2x = result.A1x + lengthHip * sin(_q1);
+    result.A2y = result.A1y - lengthHip * cos(_q1);
+
+    result.A3x = result.A2x + lengthKnee * sin(_q1 + _q21);
+    result.A3y = result.A2y - lengthKnee * cos(_q1 + _q21);
+
+    return result;
+}
+
 struct AxisForWalk1
 {
     float x_set = 0;
@@ -182,23 +197,19 @@ struct Angle
 Angle inverseKinematics(float x_des, float z_des, float x_start, float z_start, float l1, float l2, float q1, float q21)
 {
     Angle angle;
-    angle.q1 = -(l2 + z_des * cos(q1 + q21) - z_start * cos(q1 + q21) - x_des * sin(q1 + q21) + x_start * sin(q1 + q21) + l1 * cos(q21) - l1 * q1 * sin(q21)) / (l1 * sin(q21));
-    angle.q21 = q21 + ((l2 * cos(q1 + q21) + l1 * cos(q1)) * (z_des - z_start + l2 * cos(q1 + q21) + l1 * cos(q1))) / (l1 * l2 * sin(q21)) + ((l2 * sin(q1 + q21) + l1 * sin(q1)) * (x_start - x_des + l2 * sin(q1 + q21) + l1 * sin(q1))) / (l1 * l2 * sin(q21));
+    angle.q1 = -(l2 + z_des*cos(q1 + q21) - z_start*cos(q1 + q21) - x_des*sin(q1 + q21) + x_start*sin(q1 + q21) + l1*cos(q21) - l1*q1*sin(q21))/(l1*sin(q21));
+    angle.q21 = q21 + ((l2*cos(q1 + q21) + l1*cos(q1))*(z_des - z_start + l2*cos(q1 + q21) + l1*cos(q1)))/(l1*l2*sin(q21)) + ((l2*sin(q1 + q21) + l1*sin(q1))*(x_start - x_des + l2*sin(q1 + q21) + l1*sin(q1)))/(l1*l2*sin(q21));
 
-    if (angle.q1 > deg2rad(85))
-    {
+    if(angle.q1 > deg2rad(85)){
         angle.q1 = deg2rad(85);
     }
-    if (angle.q1 < deg2rad(-15))
-    {
+    if(angle.q1 < deg2rad(-15)){
         angle.q1 = deg2rad(-15);
     }
-    if (angle.q21 < deg2rad(-90))
-    {
+    if(angle.q21 < deg2rad(-90)){
         angle.q21 = deg2rad(-90);
     }
-    if (angle.q21 > deg2rad(-3))
-    {
+    if(angle.q21 > deg2rad(-3)){
         angle.q21 = deg2rad(-3);
     }
     return angle;
@@ -777,7 +788,8 @@ void mainControl()
     {
     case SS_MAIN_MENU:
     {
-        if (isSSChange());
+        if (isSSChange())
+            ;
         if (Serial.available())
         {
             String input = Serial.readStringUntil('\n');
@@ -1815,13 +1827,25 @@ void mainControl()
         {
         case 0:
         {
-            kinematics = directKinematics(lengthHip, lengthKnee);
+            kinematics = directKinematics(lengthHip, lengthKnee); // смотрим где мы сейчас
+
             x_ankle_start = kinematics.A3x;
             y_ankle_start = kinematics.A3y;
-            getApproxHmnGt(_x_targ, _y_targ, 0);
+            
+            Serial.print("ПЗК: ");
+            Serial.print(kinematics.A3x);
+            Serial.print(" , ");
+            Serial.println(kinematics.A3y);
 
-            _x_targ = hmn_gt_scaling * _x_targ;
-            _y_targ = (hmn_gt_scaling * _y_targ) + hmn_gt_z_offset;
+            getApproxHmnGt(_x_targ, _y_targ, 0); // определяем координаты гсс в 0 момент времени
+
+            _x_targ += x_offset;
+            _y_targ += y_offset;
+
+            Serial.print("Желаемые точки: ");
+            Serial.print(_x_targ);
+            Serial.print(" , ");
+            Serial.println(_y_targ);
 
             step_x = (_x_targ - x_ankle_start) / (100 - 1);
             step_y = (_y_targ - y_ankle_start) / (100 - 1);
@@ -1829,7 +1853,8 @@ void mainControl()
             angle.q1 = deg2rad(-1 * encodHipRightLink.getPositionDeg());
             angle.q21 = deg2rad(-1 * encodKneeRightLink.getPositionDeg());
 
-            for (int i = 0; i < 100; i++)
+            // ищем желаемые углы
+            for (int i = 0; i < 100; ++i)
             {
                 _x_targ = x_ankle_start + (i * step_x);
                 _y_targ = y_ankle_start + (i * step_y);
@@ -1838,22 +1863,20 @@ void mainControl()
             }
             q1_des = rad2deg(-1 * angle.q1);
             q21_des = rad2deg(-1 * angle.q21);
+            
+            Serial.print("ОЗК: ");
             Serial.print(q1_des);
             Serial.print(" , ");
             Serial.println(q21_des);
+            
+            // расчитываем коэффициенты полинома для установки ноги в начальное положение
+            __poly_hip_right.calculate(encodHipRightLink.getPositionDeg(), q1_des, 5000);
+
             mode = 1;
         }
         break;
 
-        case 1:
-        {
-            __poly_hip_right.calculate(encodHipRightLink.getPositionDeg(), q1_des, 0, 0, 0, 3000);
-            mode = 2;
-        }
-        break;
-
-        case 2:
-        {
+        case 1:{
             _hip_right_set_pos_deg = __poly_hip_right.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
@@ -1866,14 +1889,18 @@ void mainControl()
             if (__poly_hip_right.isFinished())
             {
                 stopAllMotorsLink();
-                __poly_knee_right.calculate(encodKneeRightLink.getPositionDeg(), q21_des, 0, 0, 0, 3000);
-                mode = 3;
+                
+                mode = 2;
             }
-        }
-        break;
+        } break;
 
-        case 3:
+        case 2:
         {
+            __poly_knee_right.calculate(encodKneeRightLink.getPositionDeg(), q21_des, 5000);
+            mode = 3;
+        }break;
+
+        case 3:{
             _knee_right_set_pos_deg = __poly_knee_right.getPosition();
 
             driverHipLeftLink.manualControlLink(0);
@@ -1885,124 +1912,228 @@ void mainControl()
             if (__poly_knee_right.isFinished())
             {
                 stopAllMotorsLink();
-                mode = 4;
+                mode = 200;
             }
+
+            kinematics = directKinematics(lengthHip, lengthKnee);
+
+            // Serial.print(q1_des);
+            // Serial.print(" , ");
+            // Serial.print(q21_des);
+            // Serial.print(" , ");
+            // Serial.print(encodHipRightLink.getPositionDeg());
+            // Serial.print(" , ");
+            // Serial.print(encodKneeRightLink.getPositionDeg());
+            // Serial.print(" , ");
+            // Serial.print(kinematics.A3x);
+            // Serial.print(" , ");
+            // Serial.println(kinematics.A3y);
+
+        }break;
+
+
+        case 100:
+        {
+            _hip_right_set_pos_deg = __poly_hip_right.getPosition();
+            _knee_right_set_pos_deg = __poly_knee_right.getPosition();
+
+            Serial.print(encodHipRightLink.getPositionDeg());
+            Serial.print(", ");
+            Serial.print(_knee_right_set_pos_deg);
+            Serial.print('\n');
+            // выставляем звенья
+            driverHipLeftLink.manualControlLink(0);
+            driverKneeLeftLink.manualControlLink(0);
+            driverFootLeftLink.manualControlLink(0);
+            driverHipRightLink.controlLink(_hip_right_set_pos_deg);
+            delayMicroseconds(3);
+            driverKneeRightLink.controlLink(_knee_right_set_pos_deg);
+            delayMicroseconds(3);
+            driverFootRightLink.manualControlLink(0);
+
+            if (__poly_hip_right.isFinished())
+                driverHipRightLink.manualControlLink(0);
+            if (__poly_knee_right.isFinished())
+                driverKneeRightLink.manualControlLink(0);
+            if (__poly_hip_right.isFinished() && __poly_knee_right.isFinished())
+                mode = 1;
         }
         break;
 
-        case 4:
+        // собственно сама походка
+        case 200:
         {
-            if (millis() - last_time_hmn_gait > 16)
-            {
-                last_time_hmn_gait = millis();
+            if(dt * (1.34 / hmn_gt_time) > 0.45) dt += 0.02;
 
-                t = k * dt;
-                getApproxHmnGt(_x_targ, _y_targ, t / hmn_gt_time);
-                k = k + 1;
+            dt += 0.01; 
+                    
+            
+            if (dt > hmn_gt_time) dt = 0;
+            
+            getApproxHmnGt(_x_targ, _y_targ, dt);
+            
 
-                if (k >= hmn_gt_size)
-                {
-                    k = hmn_gt_size;
-                }
+            _x_targ = _x_targ + x_offset;
+            _y_targ = y_offset + _y_targ;
 
-                _x_targ = hmn_gt_scaling * _x_targ;
-                _y_targ = (hmn_gt_scaling * _y_targ) + hmn_gt_z_offset;
-            }
 
-            if (k == hmn_gt_size)
-                k = 0;
+            q1 = deg2rad(-1 * encodHipRightLink.getPositionDeg());
+            q21 = deg2rad(-1 * encodKneeRightLink.getPositionDeg());
 
-            angle = inverseKinematics(_x_targ, _y_targ, 0, 0, lengthHip, lengthKnee, deg2rad(-1 * encodHipRightLink.getPositionDeg()), deg2rad(-1 * encodKneeRightLink.getPositionDeg()));
+            angle = inverseKinematics(_x_targ, _y_targ, 0, 0, lengthHip, lengthKnee,
+                                      q1, q21);
 
-            kinematics = directKinematics(lengthHip, lengthKnee);
+            q1_des = rad2deg(-1 * angle.q1);
+            q21_des = rad2deg(-1 * angle.q21);
 
             driverHipLeftLink.manualControlLink(0);
             driverKneeLeftLink.manualControlLink(0);
             driverFootLeftLink.manualControlLink(0);
-            driverHipRightLink.controlLink(rad2deg(-1 * angle.q1));
-            driverKneeRightLink.controlLink(rad2deg(-1 * angle.q21));
+            driverHipRightLink.controlLink(q1_des);
+            
+            driverKneeRightLink.controlLink(q21_des);
+            
             driverFootRightLink.manualControlLink(0);
 
+            kinematics = directKinematics(lengthHip, lengthKnee);
+
+            Serial.print(_x_targ);
+            Serial.print(", ");
+            Serial.print(_y_targ);
+            Serial.print(", ");
             Serial.print(kinematics.A3x);
             Serial.print(" , ");
-            Serial.print(_x_targ, 6);
-            Serial.print(" , ");
             Serial.print(kinematics.A3y);
+            Serial.print(", ");
+            Serial.print(q1_des);
             Serial.print(" , ");
-            Serial.println(_y_targ, 6);
+            Serial.print(q21_des);
+            Serial.print(" , ");
+            Serial.print(q1);
+            Serial.print(" , ");
+            Serial.print(q21);
+            Serial.print(" , ");
+            Serial.print(dt);
+            Serial.print('\n');
+            mode = 200;
         }
         break;
+
+            // кейс 4: запуск походки
+
+            // case 4:
+            // {
+            //     if (millis() - last_time_hmn_gait > 16)
+            //     {
+            //         last_time_hmn_gait = millis();
+
+            //         t = k * dt;
+            //         getApproxHmnGt(_x_targ, _y_targ, t / hmn_gt_time); //функция расчета фурье
+            //         k = k + 1;
+
+            //         if (k >= hmn_gt_size)
+            //         {
+            //             k = hmn_gt_size;
+            //         }
+
+            //         _x_targ = hmn_gt_scaling * _x_targ;
+            //         _y_targ = (hmn_gt_scaling * _y_targ) + hmn_gt_z_offset;
+            //     }
+
+            //     if (k == hmn_gt_size)
+            //         k = 0;
+
+            //     angle = inverseKinematics(_x_targ, _y_targ, 0, 0, lengthHip, lengthKnee, deg2rad(-1 * encodHipRightLink.getPositionDeg()), deg2rad(-1 * encodKneeRightLink.getPositionDeg()));
+
+            //     kinematics = directKinematics(lengthHip, lengthKnee);
+
+            //     driverHipLeftLink.manualControlLink(0);
+            //     driverKneeLeftLink.manualControlLink(0);
+            //     driverFootLeftLink.manualControlLink(0);
+            //     driverHipRightLink.controlLink(rad2deg(-1 * angle.q1));
+            //     driverKneeRightLink.controlLink(rad2deg(-1 * angle.q21));
+            //     driverFootRightLink.manualControlLink(0);
+
+            //     Serial.print(kinematics.A3x);
+            //     Serial.print(" , ");
+            //     Serial.print(_x_targ, 6);
+            //     Serial.print(" , ");
+            //     Serial.print(kinematics.A3y);
+            //     Serial.print(" , ");
+            //     Serial.println(_y_targ, 6);
+            // }
+            // break;
         }
     }
     break;
-    // case SS_MAIN_MENU:
-    // {
-    //     if (isSSChange())
-    //         ;
-    //     // Ждем ручной запуск системы
-    //     if (Serial.available())
-    //     {
-    //         String input = Serial.readStringUntil('\n');
-    //         if (input.equals("Init"))
-    //         {
-    //             system_state = SS_ZEROING_ADJ;
-    //             is_zeroed_flag = false;
-    //         }
-    //         else if (input.startsWith("Demo"))
-    //         {
-    //             system_state = SS_DEMO_ADJ;
-    //         }
-    //         else if (input.startsWith("ManAdj"))
-    //         {
-    //             String params[7];
-    //             int paramsCount = 0;
-    //             int speed;
-    //             int motorNumber;
-    //             splitString(input, ';', params, 7, paramsCount);
-    //             if (paramsCount > 1)
-    //             {
-    //                 for (int i = 1; i < paramsCount; i++)
-    //                 {
-    //                     String param = params[i];
-    //                     if (param.length() > 0)
-    //                     {
-    //                         motorNumber = param.toInt();
-    //                         speed = param.substring(param.indexOf(':') + 1).toInt();
-    //                         if (input.startsWith("ManAdjUp"))
-    //                             setMotorSpeedAdj(motorNumber, speed);
-    //                         else if (input.startsWith("ManAdjDown"))
-    //                             setMotorSpeedAdj(motorNumber, -speed);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         else if (input.startsWith("Length"))
-    //         {
-    //             String params[7];
-    //             int paramsCount = 0;
-    //             splitString(input, ';', params, 7, paramsCount);
-    //             if (paramsCount > 1)
-    //             {
-    //                 for (int i = 1; i < paramsCount; i++)
-    //                 {
-    //                     String param = params[i];
-    //                     if (param.length() > 0)
-    //                     {
-    //                         linkNumber = param.substring(0, param.indexOf(':') + 1).toInt();
-    //                         length = param.substring(param.indexOf(':') + 1, param.lastIndexOf(':')).toInt();
-    //                         time = param.substring(param.lastIndexOf(':') + 1).toInt();
-    //                         system_state = SS_POSITION_DESIRED_ADJ;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         else if (input.equals("Stop"))
-    //         {
-    //             stopAllMotors();
-    //         }
-    //     }
-    // }
-    // break;
+        // case SS_MAIN_MENU:
+        // {
+        //     if (isSSChange())
+        //         ;
+        //     // Ждем ручной запуск системы
+        //     if (Serial.available())
+        //     {
+        //         String input = Serial.readStringUntil('\n');
+        //         if (input.equals("Init"))
+        //         {
+        //             system_state = SS_ZEROING_ADJ;
+        //             is_zeroed_flag = false;
+        //         }
+        //         else if (input.startsWith("Demo"))
+        //         {
+        //             system_state = SS_DEMO_ADJ;
+        //         }
+        //         else if (input.startsWith("ManAdj"))
+        //         {
+        //             String params[7];
+        //             int paramsCount = 0;
+        //             int speed;
+        //             int motorNumber;
+        //             splitString(input, ';', params, 7, paramsCount);
+        //             if (paramsCount > 1)
+        //             {
+        //                 for (int i = 1; i < paramsCount; i++)
+        //                 {
+        //                     String param = params[i];
+        //                     if (param.length() > 0)
+        //                     {
+        //                         motorNumber = param.toInt();
+        //                         speed = param.substring(param.indexOf(':') + 1).toInt();
+        //                         if (input.startsWith("ManAdjUp"))
+        //                             setMotorSpeedAdj(motorNumber, speed);
+        //                         else if (input.startsWith("ManAdjDown"))
+        //                             setMotorSpeedAdj(motorNumber, -speed);
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         else if (input.startsWith("Length"))
+        //         {
+        //             String params[7];
+        //             int paramsCount = 0;
+        //             splitString(input, ';', params, 7, paramsCount);
+        //             if (paramsCount > 1)
+        //             {
+        //                 for (int i = 1; i < paramsCount; i++)
+        //                 {
+        //                     String param = params[i];
+        //                     if (param.length() > 0)
+        //                     {
+        //                         linkNumber = param.substring(0, param.indexOf(':') + 1).toInt();
+        //                         length = param.substring(param.indexOf(':') + 1, param.lastIndexOf(':')).toInt();
+        //                         time = param.substring(param.lastIndexOf(':') + 1).toInt();
+        //                         system_state = SS_POSITION_DESIRED_ADJ;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         else if (input.equals("Stop"))
+        //         {
+        //             stopAllMotors();
+        //         }
+        //     }
+        // }
+        // break;
 
     case SS_POSITION_DESIRED_ADJ:
     {

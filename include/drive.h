@@ -23,10 +23,10 @@ class DriverControllerMaxon : public GyverPID{
             int _pwm = constrain(abs(_voltage), 0, 24) * (_OUTPUT_LIMIT_MAX / 24);
             if(_voltage > 0){
                 digitalWrite(_pin_dir, LOW);
-                _pwm = map(_pwm, 0, 255, 24, 229);
+                _pwm = map(_pwm, 0, 1023, 102, 921);
             } else if(_voltage < 0) {
                digitalWrite(_pin_dir, HIGH);
-                _pwm = map(_pwm, 0, 255, 24, 229);
+                _pwm = map(_pwm, 0, 1023, 102, 921);
             } else{
                 _pwm = 24;
             }
@@ -52,12 +52,12 @@ class DriverControllerMaxon : public GyverPID{
                 // Получаем от регулятора и масштабируем ШИМ (убираем по 10% от краев, ограничение драйвера)
                 // 20 - подобрано во время демонстрации. 10% - это 26, но с таким ШИМом драйвер продолжает медленно перемещаться
                 // Нужно экспериментально уменьшить диапазон до меньшего значения
-                _output = map(getResultTimer(), 0, 255, 24, 229);
+                _output = map(getResultTimer(), 0, 1023, 102, 921);
                 // Опускаем флаг успешного позиционирования
                 _is_positioned = false;
             }else if(_error < -1 * _ALLOW_ERROR){
                 digitalWrite(_pin_dir, HIGH);
-                _output = map(getResultTimer(), -1, -255, 24, 229);
+                _output = map(getResultTimer(), -1, -1023, 102, 921);
                 _is_positioned = false;
             }
             // Если мы находимся в допуске
@@ -69,6 +69,7 @@ class DriverControllerMaxon : public GyverPID{
             }
             // Генерируем ШИМ
             analogWrite(_pin_pwm, _output);  
+            // Serial.println(_output);
         }
 
         // Включает/выключает питание привода
@@ -83,8 +84,8 @@ class DriverControllerMaxon : public GyverPID{
 
     private:
         // Граничные значения регулятора
-        const int _OUTPUT_LIMIT_MIN = -255;
-        const int _OUTPUT_LIMIT_MAX = 255;
+        const int _OUTPUT_LIMIT_MIN = -921;
+        const int _OUTPUT_LIMIT_MAX = 921;
         // Максимальная допустимая ошибка (~3 тика в градусах)
         const int _ALLOW_ERROR = 1.06;
         // Флаг, поднимаемый при попадании привода в допуск
@@ -118,13 +119,13 @@ const int PID_DRIVER_DT = 10;
 
 // ТУДУ ПОДОБРАНЫ НА ГЛАЗ ПРИ 24В ПИТАНИЯ
 // Коэффициенты регулятора приводов бедра
-const float HIP_DRIVER_KP = 5.0;
+const float HIP_DRIVER_KP = 11.5;
 const float HIP_DRIVER_KI = 0.0;
-const float HIP_DRIVER_KD = 5.0;
+const float HIP_DRIVER_KD = 0.0;
 // Коэффициенты регулятора приводов колена
-const float KNEE_DRIVER_KP = 15.0;
+const float KNEE_DRIVER_KP = 13.0;
 const float KNEE_DRIVER_KI = 0.0;
-const float KNEE_DRIVER_KD = 5.0;
+const float KNEE_DRIVER_KD = 0.5;
 // Коэффициенты регулятора приводов стопы
 const float FOOT_DRIVER_KP = 13.0;
 const float FOOT_DRIVER_KI = 0.0;

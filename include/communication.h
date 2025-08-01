@@ -30,13 +30,13 @@ void updateSensors(){
     // force_foot_right3 = scaleFootRight3.getForce();
 
     //регулировки
-    value_hip_left = encodHipLeftAdj.getPosition();
-    value_knee_left = encodKneeLeftAdj.getPosition();
-    value_foot_left = getAngleFootLeftADC();
+    // value_hip_left = encodHipLeftAdj.getPosition();
+    // value_knee_left = encodKneeLeftAdj.getPosition();
+    // value_foot_left = getAngleFootLeftADC();
 
-    value_hip_right = encodHipRightAdj.getPosition();
-    value_knee_right = encodKneeRightAdj.getPosition();
-    value_foot_right = getAngleFootRightADC();
+    // value_hip_right = encodHipRightAdj.getPosition();
+    // value_knee_right = encodKneeRightAdj.getPosition();
+    // value_foot_right = getAngleFootRightADC();
 }
 
 void sendingData(){
@@ -62,44 +62,44 @@ void sendingData(){
         _output += -1 * angle_foot_right;
         _output += separator;
 
-        _output += force_hip_left;
-        _output += separator;
-        _output += force_knee_left;
-        _output += separator;
+        // _output += force_hip_left;
+        // _output += separator;
+        // _output += force_knee_left;
+        // _output += separator;
 
-        _output += force_hip_right;
-        _output += separator;
-        _output += force_knee_right;
-        _output += separator;
+        // _output += force_hip_right;
+        // _output += separator;
+        // _output += force_knee_right;
+        // _output += separator;
 
-        _output += force_foot_left1;
-        _output += separator;
-        _output += force_foot_left2;
-        _output += separator;
-        _output += force_foot_left3;
-        _output += separator;
+        // _output += force_foot_left1;
+        // _output += separator;
+        // _output += force_foot_left2;
+        // _output += separator;
+        // _output += force_foot_left3;
+        // _output += separator;
 
-        _output += force_foot_right1;
-        _output += separator;
-        _output += force_foot_right2;
-        _output += separator;
-        _output += force_foot_right3;
-        _output += separator;
+        // _output += force_foot_right1;
+        // _output += separator;
+        // _output += force_foot_right2;
+        // _output += separator;
+        // _output += force_foot_right3;
+        // _output += separator;
 
-        _output += value_hip_left;
-        _output += separator;
-        _output += value_knee_left;
-        _output += separator;
-        _output += value_foot_left;
-        _output += separator;
-        _output += value_hip_right;
-        _output += separator;
-        _output += value_knee_right;
-        _output += separator;
-        _output += value_foot_right;
+        // _output += value_hip_left;
+        // _output += separator;
+        // _output += value_knee_left;
+        // _output += separator;
+        // _output += value_foot_left;
+        // _output += separator;
+        // _output += value_hip_right;
+        // _output += separator;
+        // _output += value_knee_right;
+        // _output += separator;
+        // _output += value_foot_right;
         _output += end_marker;
 
-        Serial.println(_output);
+        // Serial.println(_output);
         _loop_timer = millis();
     }
 }
