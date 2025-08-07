@@ -125,7 +125,7 @@ const float HIP_DRIVER_KD = 0.0;
 // Коэффициенты регулятора приводов колена
 const float KNEE_DRIVER_KP = 13.0;
 const float KNEE_DRIVER_KI = 0.0;
-const float KNEE_DRIVER_KD = 0.5;
+const float KNEE_DRIVER_KD = 0.0;
 // Коэффициенты регулятора приводов стопы
 const float FOOT_DRIVER_KP = 13.0;
 const float FOOT_DRIVER_KI = 0.0;

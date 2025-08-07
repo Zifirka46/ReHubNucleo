@@ -2014,6 +2014,8 @@ void mainControl()
             Serial.print(q21);
             Serial.print(" , ");
             Serial.print(dt);
+            Serial.print(" , ");
+            Serial.print(millis());
             Serial.print('\n');
             mode = 200;
         }

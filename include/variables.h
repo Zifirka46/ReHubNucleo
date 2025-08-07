@@ -52,8 +52,8 @@ float lengthKnee = 0.39;        // Длина голени
 float ls = 0.2;
 float hs = 0.1;
 const int hmn_gt_time = 2; // Пар-тр для 3 походки(время шага)
-float hmn_gt_scaling = 0.85;
-float hmn_gt_scaling_z = 1.2;
+float hmn_gt_scaling = 0.9;
+float hmn_gt_scaling_z = 0.9;
 
 float x_ankle_start_des; // Желаемая точка по иксу
 float y_ankle_start_des; // Желаемая точка по игрику
