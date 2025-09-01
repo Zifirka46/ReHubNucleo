@@ -1963,8 +1963,8 @@ void mainControl()
         // собственно сама походка
         case 200:
         {
-            if(dt * (1.34 / hmn_gt_time) > 0.45) dt += 0.02;
-
+            if(dt * (1.34 / hmn_gt_time) > 0.48) dt += 0.013;
+            // if(dt * (1.34 / hmn_gt_time) > 0.8) dt += 0.025;
             dt += 0.01; 
                     
             
